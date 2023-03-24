@@ -110,7 +110,7 @@ extension Theme {
       .fixedSize(horizontal: false, vertical: true)
     }
     .codeBlock { label in
-      ScrollView(.horizontal) {
+//      ScrollView(.horizontal) {
         label
           .relativeLineSpacing(.em(0.225))
           .markdownTextStyle {
@@ -118,7 +118,7 @@ extension Theme {
             FontSize(.em(0.85))
           }
           .padding(16)
-      }
+//      }
       .background(Color.secondaryBackground)
       .clipShape(RoundedRectangle(cornerRadius: 6))
       .markdownMargin(top: 0, bottom: 16)
