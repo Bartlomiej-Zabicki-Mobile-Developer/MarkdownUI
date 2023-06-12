@@ -17,6 +17,7 @@ struct HeadingsView: View {
     ## The second largest heading
     ###### The smallest heading
     """
+  @State var rangeHighlightConfiguration: RangeHighlightConfiguration = .init(range: .init(location: 0, length: 5), color: .blue)
 
   var body: some View {
     DemoView {
@@ -35,6 +36,7 @@ struct HeadingsView: View {
           }
       }
     }
+    .rangeHighlight(rangeHighlightConfiguration)
   }
 }
 
