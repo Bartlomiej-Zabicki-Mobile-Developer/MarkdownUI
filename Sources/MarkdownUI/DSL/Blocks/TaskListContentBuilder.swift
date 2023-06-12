@@ -12,7 +12,7 @@ import Foundation
   }
 
   public static func buildExpression(_ expression: String) -> [TaskListItem] {
-    [.init(expression)]
+      [.init(expression, range: .init())]
   }
 
   public static func buildExpression(_ expression: TaskListItem) -> [TaskListItem] {

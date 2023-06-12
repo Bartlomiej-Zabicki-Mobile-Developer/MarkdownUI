@@ -5,22 +5,25 @@ struct LazyLoadingView: View {
   struct Item: Identifiable {
     let id = UUID()
     let content = MarkdownContent {
-      Heading(.level2) {
+        Heading(.level2, range: .init()) {
         "Try MarkdownUI"
       }
-      Paragraph {
-        Strong("MarkdownUI")
+        Paragraph(content: {
+        Strong("MarkdownUI", range: .init())
         " is a native Markdown renderer for SwiftUI"
         " compatible with the "
         InlineLink(
           "GitHub Flavored Markdown Spec",
-          destination: URL(string: "https://github.github.com/gfm/")!
+          destination: URL(string: "https://github.github.com/gfm/")!,
+          range: .init()
         )
         "."
-      }
-      Paragraph {
-        InlineImage(source: .randomImage())
-      }
+        },
+                  range: .init())
+        Paragraph(content: {
+        InlineImage(source: .randomImage(), range: .init())
+        },
+                  range: .init())
     }
   }
 

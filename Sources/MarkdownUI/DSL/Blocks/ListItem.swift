@@ -25,16 +25,18 @@ import Foundation
 /// ![](ListItem)
 public struct ListItem: Hashable {
   let children: [BlockNode]
+    let range: NSRange
 
-  init(children: [BlockNode]) {
+  init(children: [BlockNode], range: NSRange) {
     self.children = children
+      self.range = range
   }
 
-  init(_ text: String) {
-    self.init(children: [.paragraph(content: [.text(text)])])
+    init(_ text: String, range: NSRange) {
+        self.init(children: [.paragraph(content: [.text(text, range: range)], range: range)], range: range)
   }
 
-  public init(@MarkdownContentBuilder content: () -> MarkdownContent) {
-    self.init(children: content().blocks)
+  public init(@MarkdownContentBuilder content: () -> MarkdownContent, range: NSRange) {
+      self.init(children: content().blocks, range: range)
   }
 }

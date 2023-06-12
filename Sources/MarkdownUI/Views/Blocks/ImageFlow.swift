@@ -34,15 +34,15 @@ extension ImageFlow {
 
     for inline in inlines {
       switch inline {
-      case let .text(text) where text.isEmpty:
+      case let .text(text, _) where text.isEmpty:
         continue
       case .softBreak:
         continue
       case .lineBreak:
         items.append(.lineBreak)
-      case let .image(source, children):
-        items.append(.image(.init(source: source, alt: children.renderPlainText())))
-      case let .link(destination, children) where children.count == 1:
+      case let .image(source, children, range):
+        items.append(.image(.init(source: source, alt: children.renderPlainText(), range: range)))
+      case let .link(destination, children, _) where children.count == 1:
         guard var data = children.first?.imageData else {
           return nil
         }

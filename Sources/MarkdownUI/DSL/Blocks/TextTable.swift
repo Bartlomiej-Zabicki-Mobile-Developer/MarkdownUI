@@ -59,15 +59,17 @@ import Foundation
 /// ![](Table-Static)
 public struct TextTable: MarkdownContentProtocol {
   public var _markdownContent: MarkdownContent {
-    .init(blocks: [.table(columnAlignments: self.columnAlignments, rows: self.rows)])
+      .init(blocks: [.table(columnAlignments: self.columnAlignments, rows: self.rows, range: self.range)])
   }
 
   private let columnAlignments: [RawTableColumnAlignment]
   private let rows: [RawTableRow]
+    private let range: NSRange
 
-  init(columnAlignments: [RawTableColumnAlignment], rows: [RawTableRow]) {
+    init(columnAlignments: [RawTableColumnAlignment], rows: [RawTableRow], range: NSRange) {
     self.columnAlignments = columnAlignments
     self.rows = rows
+        self.range = range
   }
 
   /// Creates a table with the given columns and rows.
@@ -107,7 +109,7 @@ public struct TextTable: MarkdownContentProtocol {
       )
     }
 
-    self.init(columnAlignments: columnAlignments, rows: CollectionOfOne(header) + body)
+      self.init(columnAlignments: columnAlignments, rows: CollectionOfOne(header) + body, range: .init())
   }
 }
 

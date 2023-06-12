@@ -32,25 +32,25 @@ private struct AttributedStringInlineRenderer {
 
   mutating func render(_ inline: InlineNode) {
     switch inline {
-    case .text(let content):
+    case .text(let content, let range):
       self.renderText(content)
     case .softBreak:
       self.renderSoftBreak()
     case .lineBreak:
       self.renderLineBreak()
-    case .code(let content):
+    case .code(let content, let range):
       self.renderCode(content)
-    case .html(let content):
+    case .html(let content, let range):
       self.renderHTML(content)
-    case .emphasis(let children):
+    case .emphasis(let children, let range):
       self.renderEmphasis(children: children)
-    case .strong(let children):
+    case .strong(let children, let range):
       self.renderStrong(children: children)
-    case .strikethrough(let children):
-      self.renderStrikethrough(children: children)
-    case .link(let destination, let children):
+    case .strikethrough(let children, let range):
+        self.renderStrikethrough(children: children)
+    case .link(let destination, let children, let range):
       self.renderLink(destination: destination, children: children)
-    case .image(let source, let children):
+    case .image(let source, let children, let range):
       self.renderImage(source: source, children: children)
     }
   }

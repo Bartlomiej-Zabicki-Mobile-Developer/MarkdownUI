@@ -8,6 +8,6 @@ public struct LineBreak: InlineContentProtocol {
   public init() {}
 
   public var _inlineContent: InlineContent {
-    .init(inlines: [.lineBreak])
+      .init(inlines: [.lineBreak(range: .init())], range: .init())
   }
 }

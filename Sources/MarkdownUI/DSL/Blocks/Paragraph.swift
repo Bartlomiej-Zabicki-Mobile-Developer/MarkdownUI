@@ -25,14 +25,16 @@ import Foundation
 /// ![](Paragraph)
 public struct Paragraph: MarkdownContentProtocol {
   public var _markdownContent: MarkdownContent {
-    .init(blocks: [.paragraph(content: self.content.inlines)])
+      .init(blocks: [.paragraph(content: self.content.inlines, range: self.range)])
   }
 
   private let content: InlineContent
+    private let range: NSRange
 
   /// Creates a paragraph element.
   /// - Parameter content: An inline content builder that returns the inlines included in the paragraph.
-  public init(@InlineContentBuilder content: () -> InlineContent) {
+    public init(@InlineContentBuilder content: () -> InlineContent, range: NSRange) {
     self.content = content()
+        self.range = range
   }
 }

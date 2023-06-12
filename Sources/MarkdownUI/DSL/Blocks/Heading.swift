@@ -30,18 +30,20 @@ public struct Heading: MarkdownContentProtocol {
   }
 
   public var _markdownContent: MarkdownContent {
-    .init(blocks: [.heading(level: self.level.rawValue, content: self.content.inlines)])
+    .init(blocks: [.heading(level: self.level.rawValue, content: self.content.inlines, range: range)])
   }
 
   private let level: Level
   private let content: InlineContent
+    private let range: NSRange
 
   /// Creates a heading element with the specified level and inline content.
   /// - Parameters:
   ///   - level: A level that determines the heading size.
   ///   - content: The inline content for the heading.
-  public init(_ level: Level = .level1, @InlineContentBuilder content: () -> InlineContent) {
+    public init(_ level: Level = .level1, range: NSRange, @InlineContentBuilder content: () -> InlineContent) {
     self.level = level
     self.content = content()
+        self.range = range
   }
 }

@@ -7,11 +7,13 @@ struct TableCell: View {
   private let row: Int
   private let column: Int
   private let cell: RawTableCell
+    private let range: NSRange
 
-  init(row: Int, column: Int, cell: RawTableCell) {
+    init(row: Int, column: Int, cell: RawTableCell, range: NSRange) {
     self.row = row
     self.column = column
     self.cell = cell
+        self.range = range
   }
 
   var body: some View {
@@ -20,7 +22,7 @@ struct TableCell: View {
         row: self.row,
         column: self.column,
         label: .init(self.label),
-        content: .init(block: .paragraph(content: cell.content))
+        content: .init(block: .paragraph(content: cell.content, range: range))
       )
     )
     .tableCellBounds(forRow: self.row, column: self.column)

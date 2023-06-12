@@ -3,13 +3,17 @@ import SwiftUI
 struct CodeBlockView: View {
   @Environment(\.theme.codeBlock) private var codeBlock
   @Environment(\.codeSyntaxHighlighter) private var codeSyntaxHighlighter
+    @Environment(\.rangeHighlighter) private var rangeHighlighter
 
   private let fenceInfo: String?
   private let content: String
+  private let range: NSRange
 
-  init(fenceInfo: String?, content: String) {
+  init(fenceInfo: String?, content: String, range: NSRange) {
     self.fenceInfo = fenceInfo
     self.content = content.hasSuffix("\n") ? String(content.dropLast()) : content
+    self.range = range
+//      print("Render content: \(self.content), with range: \(self.range)")
   }
 
   var body: some View {
@@ -23,7 +27,7 @@ struct CodeBlockView: View {
   }
 
   private var label: some View {
-    self.codeSyntaxHighlighter.highlightCode(self.content, language: self.fenceInfo)
+    self.codeSyntaxHighlighter.highlightCode(self.content, language: "swift", range: range)
       .textStyleFont()
       .textStyleForegroundColor()
   }

@@ -1,13 +1,81 @@
 import Foundation
 @_implementationOnly import cmark_gfm
 
+struct BlockNodeWithValue {
+    let block: [BlockNode]
+    let value: String
+}
+
 extension Array where Element == BlockNode {
-  init(markdown: String) {
-    let blocks = UnsafeNode.parseMarkdown(markdown) { document in
-      document.children.compactMap(BlockNode.init(unsafeNode:))
+    
+    static func createBlocksWithValue(markdown: String) -> BlockNodeWithValue {
+        var value: String = ""
+        let blocks = UnsafeNode.parseMarkdown(markdown) { document in
+//            let docRange = document.sumRangeAndValue()
+            var globalRange: NSRange = .init()
+//            print("Doc range: \(docRange)")
+            return document.children.compactMap({ node in
+                let childRange = node.sumRangeAndValue()
+                //          if globalRange.location == 0 {
+                //              globalRange.location += globalRange.length
+                //          } else {
+                //              globalRange.location += globalRange.length + 1
+                //          }
+                var newValue = childRange.value
+                if !newValue.hasSuffix(".") {
+                    newValue.append(".")
+                }
+                newValue.append(" ")
+                value.append(newValue)
+                globalRange.location += globalRange.length
+                globalRange.length = newValue.count //+ 2
+                //          globalRange.length += Int(node.pointee.content.size)///childRange.length
+                //          print("Doc : \(docRange)")
+                //          print("Child range: \(childRange) for: \(node.literal)")
+                //          if let literal = node.literal {
+                //              range.length += literal.count
+                //              print("Literal: \(literal), line: \(node.listStart)")
+                //          } else {
+                //              print("\(node.children)")
+                //          }
+                //          let blockRange = globalRange.
+                return BlockNode.init(unsafeNode: .init(unsafeNode: node, range: globalRange))
+            })
+        }
+            
+            return BlockNodeWithValue(block: .init(blocks ?? .init()), value: value)
     }
-    self.init(blocks ?? .init())
-  }
+    
+//  init(markdown: String) {
+//    let blocks = UnsafeNode.parseMarkdown(markdown) { document in
+//        let docRange = document.sumRange()
+//        var globalRange: NSRange = .init()
+//        print("Doc range: \(docRange)")
+//      return document.children.compactMap({ node in
+//          let childRange = node.sumRange()
+////          if globalRange.location == 0 {
+////              globalRange.location += globalRange.length
+////          } else {
+////              globalRange.location += globalRange.length + 1
+////          }
+//          globalRange.location += globalRange.length
+//          globalRange.length = childRange.length //+ 2
+////          globalRange.length += Int(node.pointee.content.size)///childRange.length
+////          print("Doc : \(docRange)")
+////          print("Child range: \(childRange) for: \(node.literal)")
+//          print("GlobalRange: \(globalRange)")
+////          if let literal = node.literal {
+////              range.length += literal.count
+////              print("Literal: \(literal), line: \(node.listStart)")
+////          } else {
+////              print("\(node.children)")
+////          }
+////          let blockRange = globalRange.
+//          return BlockNode.init(unsafeNode: .init(unsafeNode: node, range: globalRange))
+//      })
+//    }
+//    self.init(blocks ?? .init())
+//  }
 
   func renderMarkdown() -> String {
     UnsafeNode.makeDocument(self) { document in
@@ -23,10 +91,11 @@ extension Array where Element == BlockNode {
 }
 
 extension BlockNode {
-  fileprivate init?(unsafeNode: UnsafeNode) {
-    switch unsafeNode.nodeType {
+  fileprivate init?(unsafeNode nodeContainer: NodeContainer) {
+    let unsafeNode = nodeContainer.unsafeNode
+    switch nodeContainer.unsafeNode.nodeType {
     case .blockquote:
-      self = .blockquote(children: unsafeNode.children.compactMap(BlockNode.init(unsafeNode:)))
+      self = .blockquote(children: unsafeNode.children.compactMap({ BlockNode(unsafeNode: .init(unsafeNode: $0, range: nodeContainer.range))}))
     case .list:
       if unsafeNode.children.contains(where: \.isTaskListItem) {
         self = .taskList(
@@ -51,20 +120,22 @@ extension BlockNode {
         }
       }
     case .codeBlock:
-      self = .codeBlock(fenceInfo: unsafeNode.fenceInfo, content: unsafeNode.literal ?? "")
+      self = .codeBlock(fenceInfo: unsafeNode.fenceInfo, content: unsafeNode.literal ?? "", range: nodeContainer.range)
     case .htmlBlock:
-      self = .htmlBlock(content: unsafeNode.literal ?? "")
+      self = .htmlBlock(content: unsafeNode.literal ?? "", range: nodeContainer.range)
     case .paragraph:
-      self = .paragraph(content: unsafeNode.children.compactMap(InlineNode.init(unsafeNode:)))
+        self = .paragraph(content: unsafeNode.children.compactMap({ InlineNode(nodeContainer: .init(unsafeNode: $0, range: nodeContainer.range))}), range: nodeContainer.range)
     case .heading:
       self = .heading(
         level: unsafeNode.headingLevel,
-        content: unsafeNode.children.compactMap(InlineNode.init(unsafeNode:))
+        content: unsafeNode.children.compactMap({ InlineNode(nodeContainer: .init(unsafeNode: $0, range: nodeContainer.range))}),
+        range: nodeContainer.range
       )
     case .table:
       self = .table(
         columnAlignments: unsafeNode.tableAlignments,
-        rows: unsafeNode.children.map(RawTableRow.init(unsafeNode:))
+        rows: unsafeNode.children.map({ RawTableRow(nodeContainer: .init(unsafeNode: $0, range: nodeContainer.range))}),
+        range: nodeContainer.range
       )
     case .thematicBreak:
       self = .thematicBreak
@@ -80,7 +151,7 @@ extension RawListItem {
     guard unsafeNode.nodeType == .item else {
       fatalError("Expected a list item but got a '\(unsafeNode.nodeType)' instead.")
     }
-    self.init(children: unsafeNode.children.compactMap(BlockNode.init(unsafeNode:)))
+      self.init(children: unsafeNode.children.compactMap({ BlockNode.init(unsafeNode: .init(unsafeNode: $0, range: .init())) }))
   }
 }
 
@@ -91,63 +162,73 @@ extension RawTaskListItem {
     }
     self.init(
       isCompleted: unsafeNode.isTaskListItemChecked,
-      children: unsafeNode.children.compactMap(BlockNode.init(unsafeNode:))
+      children: unsafeNode.children.compactMap({ BlockNode.init(unsafeNode: .init(unsafeNode: $0, range: .init())) })
     )
   }
 }
 
 extension RawTableRow {
-  fileprivate init(unsafeNode: UnsafeNode) {
+  fileprivate init(nodeContainer: NodeContainer) {
+    let unsafeNode = nodeContainer.unsafeNode
     guard unsafeNode.nodeType == .tableRow || unsafeNode.nodeType == .tableHead else {
       fatalError("Expected a table row but got a '\(unsafeNode.nodeType)' instead.")
     }
-    self.init(cells: unsafeNode.children.map(RawTableCell.init(unsafeNode:)))
+    self.init(cells: unsafeNode.children.map({ RawTableCell(nodeContainer: .init(unsafeNode: $0, range: nodeContainer.range)) }))
   }
 }
 
 extension RawTableCell {
-  fileprivate init(unsafeNode: UnsafeNode) {
+  fileprivate init(nodeContainer: NodeContainer) {
+    let unsafeNode = nodeContainer.unsafeNode
     guard unsafeNode.nodeType == .tableCell else {
       fatalError("Expected a table cell but got a '\(unsafeNode.nodeType)' instead.")
     }
-    self.init(content: unsafeNode.children.compactMap(InlineNode.init(unsafeNode:)))
+    self.init(content: unsafeNode.children.compactMap({ InlineNode(nodeContainer: .init(unsafeNode: $0, range: nodeContainer.range)) }))
   }
 }
 
 extension InlineNode {
-  fileprivate init?(unsafeNode: UnsafeNode) {
+  fileprivate init?(nodeContainer: NodeContainer) {
+    let unsafeNode = nodeContainer.unsafeNode
     switch unsafeNode.nodeType {
     case .text:
-      self = .text(unsafeNode.literal ?? "")
+        self = .text(unsafeNode.literal ?? "", range: nodeContainer.range)
     case .softBreak:
-      self = .softBreak
+        self = .softBreak(range: nodeContainer.range)
     case .lineBreak:
-      self = .lineBreak
+      self = .lineBreak(range: nodeContainer.range)
     case .code:
-      self = .code(unsafeNode.literal ?? "")
+      self = .code(unsafeNode.literal ?? "", range: nodeContainer.range)
     case .html:
-      self = .html(unsafeNode.literal ?? "")
+      self = .html(unsafeNode.literal ?? "", range: nodeContainer.range)
     case .emphasis:
-      self = .emphasis(children: unsafeNode.children.compactMap(InlineNode.init(unsafeNode:)))
+      self = .emphasis(children: unsafeNode.children.compactMap({ InlineNode(nodeContainer: .init(unsafeNode: $0, range: nodeContainer.range)) }), range: nodeContainer.range)
     case .strong:
-      self = .strong(children: unsafeNode.children.compactMap(InlineNode.init(unsafeNode:)))
+      self = .strong(children: unsafeNode.children.compactMap({ InlineNode(nodeContainer: .init(unsafeNode: $0, range: nodeContainer.range)) }), range: nodeContainer.range)
     case .strikethrough:
-      self = .strikethrough(children: unsafeNode.children.compactMap(InlineNode.init(unsafeNode:)))
+      self = .strikethrough(children: unsafeNode.children.compactMap({ InlineNode(nodeContainer: .init(unsafeNode: $0, range: nodeContainer.range)) }), range: nodeContainer.range)
     case .link:
       self = .link(
         destination: unsafeNode.url ?? "",
-        children: unsafeNode.children.compactMap(InlineNode.init(unsafeNode:))
+        children: unsafeNode.children.compactMap({ InlineNode(nodeContainer: .init(unsafeNode: $0, range: nodeContainer.range)) }),
+        range: nodeContainer.range
       )
     case .image:
       self = .image(
         source: unsafeNode.url ?? "",
-        children: unsafeNode.children.compactMap(InlineNode.init(unsafeNode:))
+        children: unsafeNode.children.compactMap({ InlineNode(nodeContainer: .init(unsafeNode: $0, range: nodeContainer.range)) }),
+        range: nodeContainer.range
       )
     default:
       assertionFailure("Unhandled node type '\(unsafeNode.nodeType)' in InlineNode.")
       return nil
     }
   }
+}
+
+private struct NodeContainer {
+  let unsafeNode: UnsafeNode
+  let range: NSRange
 }
 
 private typealias UnsafeNode = UnsafeMutablePointer<cmark_node>
@@ -214,6 +295,41 @@ extension UnsafeNode {
     }
   }
 
+    func sumRange() -> NSRange {
+//        print("NodeType: \(nodeType)")
+        var range: NSRange = .init()
+        switch nodeType {
+        case .lineBreak:
+            range.length += 1
+        default: break
+        }
+        if let literal {
+            range.length += literal.count
+        }
+        
+        children.forEach { node in
+            let childRange = node.sumRange()
+            range.length += childRange.length
+        }
+        return range
+    }
+    
+    func sumRangeAndValue() -> (range: NSRange, value: String) {
+        var range: NSRange = .init()
+        var value: String = ""
+        if let literal {
+            range.length += literal.count
+            value += literal
+        }
+        
+        children.forEach { node in
+            let childRange = node.sumRangeAndValue()
+            range.length += childRange.range.length
+            value += childRange.value
+        }
+        return (range: range, value: value)
+    }
+    
   fileprivate static func parseMarkdown<ResultType>(
     _ markdown: String,
     body: (UnsafeNode) throws -> ResultType
@@ -258,58 +374,58 @@ extension UnsafeNode {
   ) rethrows -> ResultType? {
     cmark_gfm_core_extensions_ensure_registered()
     guard let document = cmark_node_new(CMARK_NODE_DOCUMENT) else { return nil }
-    blocks.compactMap(UnsafeNode.make).forEach { cmark_node_append_child(document, $0) }
+    blocks.compactMap(UnsafeNode.make).forEach { cmark_node_append_child(document, $0.unsafeNode) }
 
     defer { cmark_node_free(document) }
     return try body(document)
   }
 
-  fileprivate static func make(_ block: BlockNode) -> UnsafeNode? {
+  fileprivate static func make(_ block: BlockNode) -> NodeContainer? {
     switch block {
     case .blockquote(let children):
       guard let node = cmark_node_new(CMARK_NODE_BLOCK_QUOTE) else { return nil }
-      children.compactMap(UnsafeNode.make).forEach { cmark_node_append_child(node, $0) }
-      return node
+      children.compactMap(UnsafeNode.make).forEach { cmark_node_append_child(node, $0.unsafeNode) }
+      return NodeContainer(unsafeNode: node, range: .init())
     case .bulletedList(let isTight, let items):
       guard let node = cmark_node_new(CMARK_NODE_LIST) else { return nil }
       cmark_node_set_list_type(node, CMARK_BULLET_LIST)
       cmark_node_set_list_tight(node, isTight ? 1 : 0)
       items.compactMap(UnsafeNode.make).forEach { cmark_node_append_child(node, $0) }
-      return node
+      return NodeContainer(unsafeNode: node, range: .init())
     case .numberedList(let isTight, let start, let items):
       guard let node = cmark_node_new(CMARK_NODE_LIST) else { return nil }
       cmark_node_set_list_type(node, CMARK_ORDERED_LIST)
       cmark_node_set_list_tight(node, isTight ? 1 : 0)
       cmark_node_set_list_start(node, Int32(start))
       items.compactMap(UnsafeNode.make).forEach { cmark_node_append_child(node, $0) }
-      return node
+      return NodeContainer(unsafeNode: node, range: .init())
     case .taskList(let isTight, let items):
       guard let node = cmark_node_new(CMARK_NODE_LIST) else { return nil }
       cmark_node_set_list_type(node, CMARK_BULLET_LIST)
       cmark_node_set_list_tight(node, isTight ? 1 : 0)
       items.compactMap(UnsafeNode.make).forEach { cmark_node_append_child(node, $0) }
-      return node
-    case .codeBlock(let fenceInfo, let content):
+      return NodeContainer(unsafeNode: node, range: .init())
+    case .codeBlock(let fenceInfo, let content, let range):
       guard let node = cmark_node_new(CMARK_NODE_CODE_BLOCK) else { return nil }
       if let fenceInfo {
         cmark_node_set_fence_info(node, fenceInfo)
       }
       cmark_node_set_literal(node, content)
-      return node
-    case .htmlBlock(let content):
+      return NodeContainer(unsafeNode: node, range: range)
+    case .htmlBlock(let content, let range):
       guard let node = cmark_node_new(CMARK_NODE_HTML_BLOCK) else { return nil }
       cmark_node_set_literal(node, content)
-      return node
-    case .paragraph(let content):
+      return NodeContainer(unsafeNode: node, range: range)
+    case .paragraph(let content, let range):
       guard let node = cmark_node_new(CMARK_NODE_PARAGRAPH) else { return nil }
       content.compactMap(UnsafeNode.make).forEach { cmark_node_append_child(node, $0) }
-      return node
-    case .heading(let level, let content):
+      return NodeContainer(unsafeNode: node, range: range)
+    case .heading(let level, let content, let range):
       guard let node = cmark_node_new(CMARK_NODE_HEADING) else { return nil }
       cmark_node_set_heading_level(node, Int32(level))
       content.compactMap(UnsafeNode.make).forEach { cmark_node_append_child(node, $0) }
-      return node
-    case .table(let columnAlignments, let rows):
+      return NodeContainer(unsafeNode: node, range: range)
+    case .table(let columnAlignments, let rows, let range):
       guard let table = cmark_find_syntax_extension("table"),
         let node = cmark_node_new_with_ext(CMARK_NODE_TABLE, table)
       else {
@@ -322,16 +438,16 @@ extension UnsafeNode {
       if let header = cmark_node_first_child(node) {
         cmark_gfm_extensions_set_table_row_is_header(header, 1)
       }
-      return node
+      return NodeContainer(unsafeNode: node, range: range)
     case .thematicBreak:
       guard let node = cmark_node_new(CMARK_NODE_THEMATIC_BREAK) else { return nil }
-      return node
+      return NodeContainer(unsafeNode: node, range: .init())
     }
   }
 
   fileprivate static func make(_ item: RawListItem) -> UnsafeNode? {
     guard let node = cmark_node_new(CMARK_NODE_ITEM) else { return nil }
-    item.children.compactMap(UnsafeNode.make).forEach { cmark_node_append_child(node, $0) }
+    item.children.compactMap(UnsafeNode.make).forEach { cmark_node_append_child(node, $0.unsafeNode) }
     return node
   }
 
@@ -342,7 +458,7 @@ extension UnsafeNode {
       return nil
     }
     cmark_gfm_extensions_set_tasklist_item_checked(node, item.isCompleted)
-    item.children.compactMap(UnsafeNode.make).forEach { cmark_node_append_child(node, $0) }
+    item.children.compactMap(UnsafeNode.make).forEach { cmark_node_append_child(node, $0.unsafeNode) }
     return node
   }
 
@@ -368,7 +484,7 @@ extension UnsafeNode {
 
   fileprivate static func make(_ inline: InlineNode) -> UnsafeNode? {
     switch inline {
-    case .text(let content):
+    case .text(let content, let range):
       guard let node = cmark_node_new(CMARK_NODE_TEXT) else { return nil }
       cmark_node_set_literal(node, content)
       return node
@@ -376,23 +492,23 @@ extension UnsafeNode {
       return cmark_node_new(CMARK_NODE_SOFTBREAK)
     case .lineBreak:
       return cmark_node_new(CMARK_NODE_LINEBREAK)
-    case .code(let content):
+    case .code(let content, let range):
       guard let node = cmark_node_new(CMARK_NODE_CODE) else { return nil }
       cmark_node_set_literal(node, content)
       return node
-    case .html(let content):
+    case .html(let content, let range):
       guard let node = cmark_node_new(CMARK_NODE_HTML_INLINE) else { return nil }
       cmark_node_set_literal(node, content)
       return node
-    case .emphasis(let children):
+    case .emphasis(let children, let range):
       guard let node = cmark_node_new(CMARK_NODE_EMPH) else { return nil }
       children.compactMap(UnsafeNode.make).forEach { cmark_node_append_child(node, $0) }
       return node
-    case .strong(let children):
+    case .strong(let children, let range):
       guard let node = cmark_node_new(CMARK_NODE_STRONG) else { return nil }
       children.compactMap(UnsafeNode.make).forEach { cmark_node_append_child(node, $0) }
       return node
-    case .strikethrough(let children):
+    case .strikethrough(let children, let range):
       guard let strikethrough = cmark_find_syntax_extension("strikethrough"),
         let node = cmark_node_new_with_ext(CMARK_NODE_STRIKETHROUGH, strikethrough)
       else {
@@ -400,12 +516,12 @@ extension UnsafeNode {
       }
       children.compactMap(UnsafeNode.make).forEach { cmark_node_append_child(node, $0) }
       return node
-    case .link(let destination, let children):
+    case .link(let destination, let children, let range):
       guard let node = cmark_node_new(CMARK_NODE_LINK) else { return nil }
       cmark_node_set_url(node, destination)
       children.compactMap(UnsafeNode.make).forEach { cmark_node_append_child(node, $0) }
       return node
-    case .image(let source, let children):
+    case .image(let source, let children, let range):
       guard let node = cmark_node_new(CMARK_NODE_IMAGE) else { return nil }
       cmark_node_set_url(node, source)
       children.compactMap(UnsafeNode.make).forEach { cmark_node_append_child(node, $0) }

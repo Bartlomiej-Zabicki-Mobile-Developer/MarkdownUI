@@ -24,6 +24,7 @@ struct DemoView<Content: View>: View {
   private let content: Content
 
   @State private var themeOption = ThemeOption(name: "Basic", theme: .basic)
+  @State var rangeHighlightConfiguration: RangeHighlightConfiguration = .init(range: .init(location: 2, length: 10), color: .blue)
 
   init(
     themeOptions: [ThemeOption] = [.gitHub, .docC, .basic],
@@ -76,6 +77,7 @@ struct DemoView<Content: View>: View {
         // which can only happen in this particular use case.
         .id(self.themeOption.name)
     }
+    .rangeHighlight(rangeHighlightConfiguration)
     .onAppear {
       self.themeOption = self.themeOptions.first ?? .basic
     }
@@ -88,7 +90,7 @@ struct DemoView_Previews: PreviewProvider {
       "Add some text **describing** what this demo is about."
     } content: {
       Markdown {
-        Heading(.level2) {
+          Heading(.level2, range: .init()) {
           "Title"
         }
         "Show an awesome **MarkdownUI** feature!"

@@ -8,6 +8,6 @@ public struct SoftBreak: InlineContentProtocol {
   public init() {}
 
   public var _inlineContent: InlineContent {
-    .init(inlines: [.softBreak])
+      .init(inlines: [.softBreak(range: .init())], range: .init())
   }
 }

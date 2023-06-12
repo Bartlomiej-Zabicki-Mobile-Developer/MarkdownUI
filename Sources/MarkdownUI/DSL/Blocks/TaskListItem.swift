@@ -31,8 +31,8 @@ public struct TaskListItem: Hashable {
     self.children = children
   }
 
-  init(_ text: String) {
-    self.init(isCompleted: false, children: [.paragraph(content: [.text(text)])])
+    init(_ text: String, range: NSRange) {
+      self.init(isCompleted: false, children: [.paragraph(content: [.text(text, range: range)], range: range)])
   }
 
   public init(isCompleted: Bool = false, @MarkdownContentBuilder content: () -> MarkdownContent) {

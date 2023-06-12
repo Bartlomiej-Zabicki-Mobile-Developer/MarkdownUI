@@ -2,9 +2,9 @@ import SwiftUI
 
 extension Sequence where Element == BlockNode {
   func filterImagesMatching(colorScheme: ColorScheme) -> [BlockNode] {
-    self.rewrite { inline in
+    let rewrited = self.rewrite { inline in
       switch inline {
-      case .image(let source, _):
+      case .image(let source, _, _):
         guard let url = URL(string: source), url.matchesColorScheme(colorScheme) else {
           return []
         }
@@ -13,6 +13,7 @@ extension Sequence where Element == BlockNode {
         return [inline]
       }
     }
+    return rewrited
   }
 }
 

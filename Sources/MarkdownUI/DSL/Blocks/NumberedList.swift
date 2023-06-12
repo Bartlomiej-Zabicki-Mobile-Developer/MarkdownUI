@@ -111,6 +111,6 @@ public struct NumberedList: MarkdownContentProtocol {
     tight: Bool = true,
     start: Int = 1
   ) where S.Element == String {
-    self.init(tight: tight, start: start, items: sequence.map(ListItem.init(_:)))
+      self.init(tight: tight, start: start, items: sequence.map({ ListItem($0, range: .init()) }))
   }
 }

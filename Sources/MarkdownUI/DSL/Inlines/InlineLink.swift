@@ -30,30 +30,32 @@ import Foundation
 /// ```
 public struct InlineLink: InlineContentProtocol {
   public var _inlineContent: InlineContent {
-    .init(inlines: [.link(destination: self.destination, children: self.content.inlines)])
+    .init(inlines: [.link(destination: self.destination, children: self.content.inlines, range: self.range)], range: self.content.range)
   }
 
   private let destination: String
   private let content: InlineContent
+    private let range: NSRange
 
-  init(destination: String, content: InlineContent) {
+  init(destination: String, content: InlineContent, range: NSRange) {
     self.destination = destination
     self.content = content
+      self.range = range
   }
 
   /// Creates a link to a given destination with an unstyled text title.
   /// - Parameters:
   ///   - text: The title of the link.
   ///   - destination: The URL for the link.
-  public init(_ text: String, destination: URL) {
-    self.init(destination: destination.absoluteString, content: .init(inlines: [.text(text)]))
+  public init(_ text: String, destination: URL, range: NSRange) {
+    self.init(destination: destination.absoluteString, content: .init(inlines: [.text(text, range: range)], range: range), range: range)
   }
 
   /// Creates a link to a given destination with a title composed of other inlines.
   /// - Parameters:
   ///   - destination: The URL for the link.
   ///   - content: An inline content builder that returns the title of the link.
-  public init(destination: URL, @InlineContentBuilder content: () -> InlineContent) {
-    self.init(destination: destination.absoluteString, content: content())
+  public init(destination: URL, range: NSRange, @InlineContentBuilder content: () -> InlineContent) {
+    self.init(destination: destination.absoluteString, content: content(), range: range)
   }
 }

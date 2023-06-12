@@ -5,11 +5,11 @@ enum BlockNode: Hashable {
   case bulletedList(isTight: Bool, items: [RawListItem])
   case numberedList(isTight: Bool, start: Int, items: [RawListItem])
   case taskList(isTight: Bool, items: [RawTaskListItem])
-  case codeBlock(fenceInfo: String?, content: String)
-  case htmlBlock(content: String)
-  case paragraph(content: [InlineNode])
-  case heading(level: Int, content: [InlineNode])
-  case table(columnAlignments: [RawTableColumnAlignment], rows: [RawTableRow])
+  case codeBlock(fenceInfo: String?, content: String, range: NSRange)
+  case htmlBlock(content: String, range: NSRange)
+  case paragraph(content: [InlineNode], range: NSRange)
+  case heading(level: Int, content: [InlineNode], range: NSRange)
+    case table(columnAlignments: [RawTableColumnAlignment], rows: [RawTableRow], range: NSRange)
   case thematicBreak
 }
 

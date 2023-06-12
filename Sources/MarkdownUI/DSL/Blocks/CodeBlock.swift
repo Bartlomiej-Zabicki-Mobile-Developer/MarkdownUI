@@ -27,18 +27,20 @@ import Foundation
 /// ![](CodeBlock)
 public struct CodeBlock: MarkdownContentProtocol {
   public var _markdownContent: MarkdownContent {
-    .init(blocks: [.codeBlock(fenceInfo: self.language, content: self.content)])
+    .init(blocks: [.codeBlock(fenceInfo: self.language, content: self.content, range: self.range)])
   }
 
   private let language: String?
   private let content: String
+  private let range: NSRange
 
-  public init(language: String? = nil, content: String) {
+  public init(language: String? = nil, content: String, range: NSRange) {
     self.language = language
     self.content = content
+    self.range = range
   }
 
-  public init(language: String? = nil, content: () -> String) {
-    self.init(language: language, content: content())
+  public init(language: String? = nil, content: () -> String, range: NSRange) {
+    self.init(language: language, content: content(), range: range)
   }
 }

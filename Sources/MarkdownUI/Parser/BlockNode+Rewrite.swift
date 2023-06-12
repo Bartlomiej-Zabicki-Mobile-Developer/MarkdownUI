@@ -80,11 +80,11 @@ extension BlockNode {
           }
         )
       ]
-    case .paragraph(let content):
-      return [.paragraph(content: try content.rewrite(r))]
-    case .heading(let level, let content):
-      return [.heading(level: level, content: try content.rewrite(r))]
-    case .table(let columnAlignments, let rows):
+    case .paragraph(let content, let range):
+      return [.paragraph(content: try content.rewrite(r), range: range)]
+    case .heading(let level, let content, let range):
+      return [.heading(level: level, content: try content.rewrite(r), range: range)]
+    case .table(let columnAlignments, let rows, let range):
       return [
         .table(
           columnAlignments: columnAlignments,
@@ -94,7 +94,8 @@ extension BlockNode {
                 RawTableCell(content: try $0.content.rewrite(r))
               }
             )
-          }
+          },
+          range: range
         )
       ]
     default:

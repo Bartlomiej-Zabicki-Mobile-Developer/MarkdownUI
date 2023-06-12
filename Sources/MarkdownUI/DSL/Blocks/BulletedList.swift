@@ -108,6 +108,6 @@ public struct BulletedList: MarkdownContentProtocol {
   ///   - tight: A `Boolean` value that indicates if the list is tight or loose. This parameter is ignored if
   ///            any of the list items contain more than one paragraph.
   public init<S: Sequence>(of sequence: S, tight: Bool = true) where S.Element == String {
-    self.init(tight: tight, items: sequence.map(ListItem.init(_:)))
+      self.init(tight: tight, items: sequence.map({ ListItem($0, range: .init())}))
   }
 }

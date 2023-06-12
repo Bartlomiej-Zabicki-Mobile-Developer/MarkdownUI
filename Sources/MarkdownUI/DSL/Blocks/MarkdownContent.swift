@@ -72,13 +72,15 @@ public struct MarkdownContent: Equatable, MarkdownContentProtocol {
 
   public var _markdownContent: MarkdownContent { self }
   let blocks: [BlockNode]
+    let rawContent: String
 
-  init(blocks: [BlockNode] = []) {
+    init(blocks: [BlockNode] = [], rawContent: String = "") {
     self.blocks = blocks
+        self.rawContent = rawContent
   }
 
   init(block: BlockNode) {
-    self.init(blocks: [block])
+      self.init(blocks: [block], rawContent: [block].renderPlainText())
   }
 
   init(_ components: [MarkdownContentProtocol]) {
@@ -88,7 +90,9 @@ public struct MarkdownContent: Equatable, MarkdownContentProtocol {
   /// Creates a Markdown content value from a Markdown-formatted string.
   /// - Parameter markdown: A Markdown-formatted string.
   public init(_ markdown: String) {
-    self.init(blocks: .init(markdown: markdown))
+//    self.init(blocks: .init(markdown: markdown))
+      let blockWithValue = [BlockNode].createBlocksWithValue(markdown: markdown)
+      self.init(blocks: blockWithValue.block, rawContent: blockWithValue.value)
   }
 
   /// Creates a Markdown content value composed of any number of blocks.

@@ -26,21 +26,23 @@ import Foundation
 /// ![](InlineImage)
 public struct InlineImage: InlineContentProtocol {
   public var _inlineContent: InlineContent {
-    .init(inlines: [.image(source: self.source, children: self.content.inlines)])
+      .init(inlines: [.image(source: self.source, children: self.content.inlines, range: self.range)], range: self.content.range)
   }
 
   private let source: String
   private let content: InlineContent
+    private let range: NSRange
 
-  init(source: String, content: InlineContent) {
+    init(source: String, content: InlineContent, range: NSRange) {
     self.source = source
     self.content = content
+        self.range = range
   }
 
   /// Creates an inline image with the given source
   /// - Parameter source: The absolute or relative path to the image.
-  public init(source: URL) {
-    self.init(source: source.absoluteString, content: .init())
+  public init(source: URL, range: NSRange) {
+      self.init(source: source.absoluteString, content: .init(range: range), range: range)
   }
 
   /// Creates an inline image with an alternate text.
@@ -48,7 +50,7 @@ public struct InlineImage: InlineContentProtocol {
   ///   - text: The alternate text for the image. A ``Markdown`` view uses this text
   ///           as the accessibility label of the image.
   ///   - source: The absolute or relative path to the image.
-  public init(_ text: String, source: URL) {
-    self.init(source: source.absoluteString, content: .init(inlines: [.text(text)]))
+  public init(_ text: String, source: URL, range: NSRange) {
+      self.init(source: source.absoluteString, content: .init(inlines: [.text(text, range: range)], range: range), range: range)
   }
 }

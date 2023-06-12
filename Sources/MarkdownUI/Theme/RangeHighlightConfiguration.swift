@@ -19,7 +19,7 @@ public struct RangeHighlightConfiguration {
   
 }
 
-extension EnvironmentValues {
+public extension EnvironmentValues {
   var rangeHighlighter: RangeHighlightConfiguration {
     get { self[RangeHighlighterKey.self] }
     set { self[RangeHighlighterKey.self] = newValue }

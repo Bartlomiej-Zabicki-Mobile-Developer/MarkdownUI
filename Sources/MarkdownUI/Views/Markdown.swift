@@ -188,6 +188,13 @@ import SwiftUI
 ///   }
 /// )
 /// ```
+public struct ContentPreferenceKey: PreferenceKey {
+    public static var defaultValue: String = ""
+    public static func reduce(value: inout String, nextValue: () -> String) {
+        value.append(nextValue())
+    }
+}
+
 public struct Markdown: View {
   @Environment(\.colorScheme) private var colorScheme
   @Environment(\.theme.text) private var text
@@ -219,6 +226,7 @@ public struct Markdown: View {
     .textStyle(self.text)
     .environment(\.baseURL, self.baseURL)
     .environment(\.imageBaseURL, self.imageBaseURL)
+    .preference(key: ContentPreferenceKey.self, value: content.rawContent)
   }
 
   private var blocks: [BlockNode] {

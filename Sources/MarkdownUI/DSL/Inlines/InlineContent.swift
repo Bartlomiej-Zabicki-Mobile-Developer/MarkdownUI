@@ -35,16 +35,18 @@ public protocol InlineContentProtocol {
 public struct InlineContent: Equatable, InlineContentProtocol {
   public var _inlineContent: InlineContent { self }
   let inlines: [InlineNode]
+  let range: NSRange
 
-  init(inlines: [InlineNode] = []) {
+  init(inlines: [InlineNode] = [], range: NSRange) {
     self.inlines = inlines
+    self.range = range
   }
 
-  init(_ components: [InlineContentProtocol]) {
-    self.init(inlines: components.map(\._inlineContent).flatMap(\.inlines))
+  init(_ components: [InlineContentProtocol], range: NSRange) {
+    self.init(inlines: components.map(\._inlineContent).flatMap(\.inlines), range: range)
   }
 
-  init(_ text: String) {
-    self.init(inlines: [.text(text)])
+    init(_ text: String, range: NSRange) {
+    self.init(inlines: [.text(text, range: range)], range: .init(location: 0, length: text.count))
   }
 }

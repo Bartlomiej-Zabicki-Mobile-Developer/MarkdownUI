@@ -53,20 +53,30 @@ private struct TextInlineRenderer {
 
   private mutating func render(_ inline: InlineNode) {
     switch inline {
-    case .text(let content):
-      self.renderText(content)
-    case .softBreak:
-      self.renderSoftBreak()
-    case .html(let content):
-      self.renderHTML(content)
-    case .image(let source, _):
+    case .text(let content, let range):
+      self.renderText(content, range: range)
+    case .softBreak(let range):
+        self.renderSoftBreak(range: range)
+    case .html(let content, let range):
+        self.renderHTML(content, range: range)
+    case .image(let source, _, let range):
       self.renderImage(source)
-    default:
-      self.defaultRender(inline)
+    case .lineBreak(range: let range):
+        self.defaultRender(inline, range: range)
+    case .code(_, range: let range):
+        self.defaultRender(inline, range: range)
+    case .emphasis(children: let children, range: let range):
+        self.defaultRender(inline, range: range)
+    case .strong(children: let children, range: let range):
+        self.defaultRender(inline, range: range)
+    case .strikethrough(children: let children, range: let range):
+        self.defaultRender(inline, range: range)
+    case .link(destination: let destination, children: let children, range: let range):
+        self.defaultRender(inline, range: range)
     }
   }
 
-  private mutating func renderText(_ text: String) {
+    private mutating func renderText(_ text: String, range: NSRange) {
     var text = text
 
     if self.shouldSkipNextWhitespace {
@@ -74,26 +84,26 @@ private struct TextInlineRenderer {
       text = text.replacingOccurrences(of: "^\\s+", with: "", options: .regularExpression)
     }
 
-    self.defaultRender(.text(text))
+        self.defaultRender(.text(text, range: range), range: range)
   }
 
-  private mutating func renderSoftBreak() {
+  private mutating func renderSoftBreak(range: NSRange) {
     if self.shouldSkipNextWhitespace {
       self.shouldSkipNextWhitespace = false
     } else {
-      self.defaultRender(.softBreak)
+        self.defaultRender(.softBreak(range: range), range: range)
     }
   }
 
-  private mutating func renderHTML(_ html: String) {
+  private mutating func renderHTML(_ html: String, range: NSRange) {
     let tag = HTMLTag(html)
 
     switch tag?.name.lowercased() {
     case "br":
-      self.defaultRender(.lineBreak)
+      self.defaultRender(.lineBreak(range: range), range: range)
       self.shouldSkipNextWhitespace = true
     default:
-      self.defaultRender(.html(html))
+        self.defaultRender(.html(html, range: range), range: range)
     }
   }
 
@@ -103,15 +113,26 @@ private struct TextInlineRenderer {
     }
   }
 
-  private mutating func defaultRender(_ inline: InlineNode) {
+    private mutating func defaultRender(_ inline: InlineNode, range: NSRange) {
     attributed += inline.renderAttributedString(
       baseURL: self.baseURL,
       textStyles: self.textStyles,
       attributes: self.attributes
     )
-    if let range: Range<AttributedString.Index> = .init(rangeHighlightConfiguration.range, in: attributed) {
-      attributed[range].backgroundColor = rangeHighlightConfiguration.color
+        
+        if let intersectionRange = rangeHighlightConfiguration.range.intersection(range) {
+            var normalizedRange = intersectionRange
+            normalizedRange.location -= range.location
+            if let range: Range<AttributedString.Index> = .init(normalizedRange, in: attributed) {
+                attributed[range].backgroundColor = rangeHighlightConfiguration.color
+            } else {
+                normalizedRange.location -= 1
+                if let range: Range<AttributedString.Index> = .init(normalizedRange, in: attributed) {
+                    attributed[range].backgroundColor = rangeHighlightConfiguration.color
+                }
+            }
+        }
+        self.result = Text(attributed)
     }
-    self.result = Text(attributed)
-  }
+    
 }

@@ -7,17 +7,19 @@ struct TableView: View {
 
   private let columnAlignments: [RawTableColumnAlignment]
   private let rows: [RawTableRow]
+    private let range: NSRange
 
-  init(columnAlignments: [RawTableColumnAlignment], rows: [RawTableRow]) {
+    init(columnAlignments: [RawTableColumnAlignment], rows: [RawTableRow], range: NSRange) {
     self.columnAlignments = columnAlignments
     self.rows = rows
+        self.range = range
   }
 
   var body: some View {
     self.table.makeBody(
       configuration: .init(
         label: .init(self.label),
-        content: .init(block: .table(columnAlignments: self.columnAlignments, rows: self.rows))
+        content: .init(block: .table(columnAlignments: self.columnAlignments, rows: self.rows, range: self.range))
       )
     )
   }
@@ -27,7 +29,7 @@ struct TableView: View {
       ForEach(0..<self.rowCount, id: \.self) { row in
         GridRow {
           ForEach(0..<self.columnCount, id: \.self) { column in
-            TableCell(row: row, column: column, cell: self.rows[row].cells[column])
+              TableCell(row: row, column: column, cell: self.rows[row].cells[column], range: self.range)
               .gridColumnAlignment(.init(self.columnAlignments[column]))
           }
         }
