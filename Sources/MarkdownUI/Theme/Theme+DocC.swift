@@ -94,19 +94,18 @@ extension Theme {
         .markdownMargin(top: .em(1.6), bottom: .zero)
     }
     .codeBlock { configuration in
-      ScrollView(.horizontal) {
-        configuration.label
-          .relativeLineSpacing(.em(0.333335))
-          .markdownTextStyle {
-            FontFamilyVariant(.monospaced)
-            FontSize(.rem(0.88235))
-          }
-          .padding(.vertical, 8)
-          .padding(.leading, 14)
-      }
-      .background(Color.codeBackground)
-      .clipShape(.container)
-      .markdownMargin(top: .em(0.8), bottom: .zero)
+      configuration.label
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .relativeLineSpacing(.em(0.333335))
+        .markdownTextStyle {
+          FontFamilyVariant(.monospaced)
+          FontSize(.rem(0.88235))
+        }
+        .padding(.vertical, 8)
+        .padding(.leading, 14)
+        .background(Color.codeBackground)
+        .clipShape(.container)
+        .markdownMargin(top: .em(0.8), bottom: .zero)
     }
     .image { configuration in
       configuration.label

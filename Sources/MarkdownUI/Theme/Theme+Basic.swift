@@ -82,16 +82,15 @@ extension Theme {
         .relativePadding(.trailing, length: .em(1))
     }
     .codeBlock { configuration in
-      ScrollView(.horizontal) {
-        configuration.label
-          .relativeLineSpacing(.em(0.15))
-          .relativePadding(.leading, length: .rem(1))
-          .markdownTextStyle {
-            FontFamilyVariant(.monospaced)
-            FontSize(.em(0.94))
-          }
-      }
-      .markdownMargin(top: .zero, bottom: .em(1))
+      configuration.label
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .relativeLineSpacing(.em(0.15))
+        .relativePadding(.leading, length: .rem(1))
+        .markdownTextStyle {
+          FontFamilyVariant(.monospaced)
+          FontSize(.em(0.94))
+        }
+        .markdownMargin(top: .zero, bottom: .em(1))
     }
     .table { configuration in
       configuration.label
