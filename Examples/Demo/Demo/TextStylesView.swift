@@ -36,10 +36,12 @@ struct TextStylesView: View {
     ```
     Use `git status` to list all new or modified files that haven't yet been committed.
     """
-
+  @State var rangeHighlightConfiguration: RangeHighlightConfiguration = .init(range: .init(), color: .blue)
+  
   var body: some View {
     DemoView {
       Markdown(self.content)
+            .textSelection(.enabled)
 
       Section("Customization Example") {
         Markdown(self.content)
@@ -62,6 +64,16 @@ struct TextStylesView: View {
         ForegroundColor(.mint)
         UnderlineStyle(.init(pattern: .dot))
       }
+        Section("Test") {
+            Button("Change") {
+              rangeHighlightConfiguration.range.location = rangeHighlightConfiguration.range.location.advanced(by: 5)
+            }
+        }
+        
+    }
+    .rangeHighlight(rangeHighlightConfiguration)
+    .onAppear {
+      rangeHighlightConfiguration.range = .init(location: 0, length: 10)
     }
   }
 }

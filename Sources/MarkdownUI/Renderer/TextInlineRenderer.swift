@@ -5,13 +5,15 @@ extension Sequence where Element == InlineNode {
     baseURL: URL?,
     textStyles: InlineTextStyles,
     images: [String: Image],
-    attributes: AttributeContainer
+    attributes: AttributeContainer,
+    rangeHighlightConfiguration: RangeHighlightConfiguration
   ) -> Text {
     var renderer = TextInlineRenderer(
       baseURL: baseURL,
       textStyles: textStyles,
       images: images,
-      attributes: attributes
+      attributes: attributes,
+      rangeHighlightConfiguration: rangeHighlightConfiguration
     )
     renderer.render(self)
     return renderer.result
@@ -20,23 +22,27 @@ extension Sequence where Element == InlineNode {
 
 private struct TextInlineRenderer {
   var result = Text("")
+    var attributed: AttributedString = .init("")
 
   private let baseURL: URL?
   private let textStyles: InlineTextStyles
   private let images: [String: Image]
   private let attributes: AttributeContainer
   private var shouldSkipNextWhitespace = false
+  private let rangeHighlightConfiguration: RangeHighlightConfiguration
 
   init(
     baseURL: URL?,
     textStyles: InlineTextStyles,
     images: [String: Image],
-    attributes: AttributeContainer
+    attributes: AttributeContainer,
+    rangeHighlightConfiguration: RangeHighlightConfiguration
   ) {
     self.baseURL = baseURL
     self.textStyles = textStyles
     self.images = images
     self.attributes = attributes
+    self.rangeHighlightConfiguration = rangeHighlightConfiguration
   }
 
   mutating func render<S: Sequence>(_ inlines: S) where S.Element == InlineNode {
@@ -98,14 +104,14 @@ private struct TextInlineRenderer {
   }
 
   private mutating func defaultRender(_ inline: InlineNode) {
-    self.result =
-      self.result
-      + Text(
-        inline.renderAttributedString(
-          baseURL: self.baseURL,
-          textStyles: self.textStyles,
-          attributes: self.attributes
-        )
-      )
+    attributed += inline.renderAttributedString(
+      baseURL: self.baseURL,
+      textStyles: self.textStyles,
+      attributes: self.attributes
+    )
+    if let range: Range<AttributedString.Index> = .init(rangeHighlightConfiguration.range, in: attributed) {
+      attributed[range].backgroundColor = rangeHighlightConfiguration.color
+    }
+    self.result = Text(attributed)
   }
 }
