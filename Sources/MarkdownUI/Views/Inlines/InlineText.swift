@@ -30,6 +30,7 @@ struct InlineText: View {
         attributes: attributes,
         rangeHighlightConfiguration: rangeHighlightConfiguration
       )
+      .textSelection(.enabled)
     }
     .task(id: self.inlines) {
       self.inlineImages = (try? await self.loadInlineImages()) ?? [:]

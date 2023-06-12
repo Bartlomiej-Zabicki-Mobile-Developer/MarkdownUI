@@ -23,6 +23,7 @@ extension Theme {
     }
     .heading1 { configuration in
       configuration.label
+        .textSelection(.enabled)
         .markdownMargin(top: .em(0.8), bottom: .zero)
         .markdownTextStyle {
           FontWeight(.semibold)
@@ -31,6 +32,7 @@ extension Theme {
     }
     .heading2 { configuration in
       configuration.label
+        .textSelection(.enabled)
         .relativeLineSpacing(.em(0.0625))
         .markdownMargin(top: .em(1.6), bottom: .zero)
         .markdownTextStyle {
@@ -40,6 +42,7 @@ extension Theme {
     }
     .heading3 { configuration in
       configuration.label
+        .textSelection(.enabled)
         .relativeLineSpacing(.em(0.07143))
         .markdownMargin(top: .em(1.6), bottom: .zero)
         .markdownTextStyle {
@@ -49,6 +52,7 @@ extension Theme {
     }
     .heading4 { configuration in
       configuration.label
+        .textSelection(.enabled)
         .relativeLineSpacing(.em(0.083335))
         .markdownMargin(top: .em(1.6), bottom: .zero)
         .markdownTextStyle {
@@ -58,6 +62,7 @@ extension Theme {
     }
     .heading5 { configuration in
       configuration.label
+        .textSelection(.enabled)
         .relativeLineSpacing(.em(0.09091))
         .markdownMargin(top: .em(1.6), bottom: .zero)
         .markdownTextStyle {
@@ -67,6 +72,7 @@ extension Theme {
     }
     .heading6 { configuration in
       configuration.label
+        .textSelection(.enabled)
         .relativeLineSpacing(.em(0.235295))
         .markdownMargin(top: .em(1.6), bottom: .zero)
         .markdownTextStyle {
@@ -75,12 +81,14 @@ extension Theme {
     }
     .paragraph { configuration in
       configuration.label
+        .textSelection(.enabled)
         .fixedSize(horizontal: false, vertical: true)
         .relativeLineSpacing(.em(0.235295))
         .markdownMargin(top: .em(0.8), bottom: .zero)
     }
     .blockquote { configuration in
       configuration.label
+        .textSelection(.enabled)
         .relativePadding(length: .rem(0.94118))
         .frame(maxWidth: .infinity, alignment: .leading)
         .background {
@@ -95,6 +103,7 @@ extension Theme {
     }
     .codeBlock { configuration in
       configuration.label
+        .textSelection(.enabled)
         .frame(maxWidth: .infinity, alignment: .leading)
         .relativeLineSpacing(.em(0.333335))
         .markdownTextStyle {
@@ -109,11 +118,13 @@ extension Theme {
     }
     .image { configuration in
       configuration.label
+        .textSelection(.enabled)
         .frame(maxWidth: .infinity)
         .markdownMargin(top: .em(1.6), bottom: .em(1.6))
     }
     .listItem { configuration in
       configuration.label
+        .textSelection(.enabled)
         .markdownMargin(top: .em(0.8))
     }
     .taskListMarker { _ in
@@ -123,12 +134,14 @@ extension Theme {
     }
     .table { configuration in
       configuration.label
+        .textSelection(.enabled)
         .fixedSize(horizontal: false, vertical: true)
         .markdownTableBorderStyle(.init(.horizontalBorders, color: .grid))
         .markdownMargin(top: .em(1.6), bottom: .zero)
     }
     .tableCell { configuration in
       configuration.label
+        .textSelection(.enabled)
         .markdownTextStyle {
           if configuration.row == 0 {
             FontWeight(.semibold)

@@ -21,6 +21,7 @@ extension Theme {
     }
     .heading1 { configuration in
       configuration.label
+        .textSelection(.enabled)
         .markdownMargin(top: .rem(1.5), bottom: .rem(1))
         .markdownTextStyle {
           FontWeight(.semibold)
@@ -29,6 +30,7 @@ extension Theme {
     }
     .heading2 { configuration in
       configuration.label
+        .textSelection(.enabled)
         .markdownMargin(top: .rem(1.5), bottom: .rem(1))
         .markdownTextStyle {
           FontWeight(.semibold)
@@ -37,6 +39,7 @@ extension Theme {
     }
     .heading3 { configuration in
       configuration.label
+        .textSelection(.enabled)
         .markdownMargin(top: .rem(1.5), bottom: .rem(1))
         .markdownTextStyle {
           FontWeight(.semibold)
@@ -45,6 +48,7 @@ extension Theme {
     }
     .heading4 { configuration in
       configuration.label
+        .textSelection(.enabled)
         .markdownMargin(top: .rem(1.5), bottom: .rem(1))
         .markdownTextStyle {
           FontWeight(.semibold)
@@ -53,6 +57,7 @@ extension Theme {
     }
     .heading5 { configuration in
       configuration.label
+        .textSelection(.enabled)
         .markdownMargin(top: .rem(1.5), bottom: .rem(1))
         .markdownTextStyle {
           FontWeight(.semibold)
@@ -61,6 +66,7 @@ extension Theme {
     }
     .heading6 { configuration in
       configuration.label
+        .textSelection(.enabled)
         .markdownMargin(top: .rem(1.5), bottom: .rem(1))
         .markdownTextStyle {
           FontWeight(.semibold)
@@ -69,12 +75,14 @@ extension Theme {
     }
     .paragraph { configuration in
       configuration.label
+        .textSelection(.enabled)
         .fixedSize(horizontal: false, vertical: true)
         .relativeLineSpacing(.em(0.15))
         .markdownMargin(top: .zero, bottom: .em(1))
     }
     .blockquote { configuration in
       configuration.label
+        .textSelection(.enabled)
         .markdownTextStyle {
           FontStyle(.italic)
         }
@@ -83,6 +91,7 @@ extension Theme {
     }
     .codeBlock { configuration in
       configuration.label
+        .textSelection(.enabled)
         .frame(maxWidth: .infinity, alignment: .leading)
         .relativeLineSpacing(.em(0.15))
         .relativePadding(.leading, length: .rem(1))
@@ -94,11 +103,13 @@ extension Theme {
     }
     .table { configuration in
       configuration.label
+        .textSelection(.enabled)
         .fixedSize(horizontal: false, vertical: true)
         .markdownMargin(top: .zero, bottom: .em(1))
     }
     .tableCell { configuration in
       configuration.label
+        .textSelection(.enabled)
         .markdownTextStyle {
           if configuration.row == 0 {
             FontWeight(.semibold)

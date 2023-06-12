@@ -34,6 +34,7 @@ extension Theme {
     .heading1 { configuration in
       VStack(alignment: .leading, spacing: 0) {
         configuration.label
+          .textSelection(.enabled)
           .relativePadding(.bottom, length: .em(0.3))
           .relativeLineSpacing(.em(0.125))
           .markdownMargin(top: 24, bottom: 16)
@@ -47,6 +48,7 @@ extension Theme {
     .heading2 { configuration in
       VStack(alignment: .leading, spacing: 0) {
         configuration.label
+          .textSelection(.enabled)
           .relativePadding(.bottom, length: .em(0.3))
           .relativeLineSpacing(.em(0.125))
           .markdownMargin(top: 24, bottom: 16)
@@ -59,6 +61,7 @@ extension Theme {
     }
     .heading3 { configuration in
       configuration.label
+        .textSelection(.enabled)
         .relativeLineSpacing(.em(0.125))
         .markdownMargin(top: 24, bottom: 16)
         .markdownTextStyle {
@@ -68,6 +71,7 @@ extension Theme {
     }
     .heading4 { configuration in
       configuration.label
+        .textSelection(.enabled)
         .relativeLineSpacing(.em(0.125))
         .markdownMargin(top: 24, bottom: 16)
         .markdownTextStyle {
@@ -76,6 +80,7 @@ extension Theme {
     }
     .heading5 { configuration in
       configuration.label
+        .textSelection(.enabled)
         .relativeLineSpacing(.em(0.125))
         .markdownMargin(top: 24, bottom: 16)
         .markdownTextStyle {
@@ -85,6 +90,7 @@ extension Theme {
     }
     .heading6 { configuration in
       configuration.label
+        .textSelection(.enabled)
         .relativeLineSpacing(.em(0.125))
         .markdownMargin(top: 24, bottom: 16)
         .markdownTextStyle {
@@ -95,6 +101,7 @@ extension Theme {
     }
     .paragraph { configuration in
       configuration.label
+        .textSelection(.enabled)
         .fixedSize(horizontal: false, vertical: true)
         .relativeLineSpacing(.em(0.25))
         .markdownMargin(top: 0, bottom: 16)
@@ -105,6 +112,7 @@ extension Theme {
           .fill(Color.border)
           .relativeFrame(width: .em(0.2))
         configuration.label
+          .textSelection(.enabled)
           .markdownTextStyle { ForegroundColor(.secondaryText) }
           .relativePadding(.horizontal, length: .em(1))
       }
@@ -112,6 +120,7 @@ extension Theme {
     }
     .codeBlock { configuration in
       configuration.label
+        .textSelection(.enabled)
         .frame(maxWidth: .infinity, alignment: .leading)
         .relativeLineSpacing(.em(0.225))
         .markdownTextStyle {
@@ -125,6 +134,7 @@ extension Theme {
     }
     .listItem { configuration in
       configuration.label
+        .textSelection(.enabled)
         .markdownMargin(top: .em(0.25))
     }
     .taskListMarker { configuration in
@@ -136,6 +146,7 @@ extension Theme {
     }
     .table { configuration in
       configuration.label
+        .textSelection(.enabled)
         .fixedSize(horizontal: false, vertical: true)
         .markdownTableBorderStyle(.init(color: .border))
         .markdownTableBackgroundStyle(
@@ -145,6 +156,7 @@ extension Theme {
     }
     .tableCell { configuration in
       configuration.label
+        .textSelection(.enabled)
         .markdownTextStyle {
           if configuration.row == 0 {
             FontWeight(.semibold)
