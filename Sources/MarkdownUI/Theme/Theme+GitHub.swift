@@ -121,7 +121,7 @@ extension Theme {
     .codeBlock { configuration in
       configuration.label
         .textSelection(.enabled)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .fixedSize(horizontal: false, vertical: true)
         .relativeLineSpacing(.em(0.225))
         .markdownTextStyle {
           FontFamilyVariant(.monospaced)
